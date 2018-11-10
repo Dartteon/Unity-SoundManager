@@ -12,6 +12,25 @@ public class SoundManager : MonoBehaviour {
     private Dictionary<string, AudioClip> audioDictionary = new Dictionary<string, AudioClip>();
     private Queue<AudioSource> readyAudioSources = new Queue<AudioSource>();
     private List<AudioSource> busyAudioSources = new List<AudioSource>();
+    
+
+    // Call this method if you have the audio file in Resources/Sounds folder
+    public static void PlaySound(string fileName) {
+        if (instance == null) {
+            Debug.Log("Trying to play sound before SoundManager can run Start()");
+            return;
+        }
+        instance.Instance_PlaySound(fileName);
+    }
+
+    // Call this method if you do not wish to load AudioClip from Resources file
+    public static void PlaySound(AudioClip audioClip) {
+        if (instance == null) {
+            Debug.Log("Trying to play sound before SoundManager can run Start()");
+            return;
+        }
+        instance.Instance_PlaySound(audioClip);
+    }
 
     void Start() {
         Initialize();
@@ -33,17 +52,13 @@ public class SoundManager : MonoBehaviour {
         }
     }
 
-    public static void PlaySound(string fileName) {
-		if (instance == null) {
-			Debug.Log("Trying to play sound before SoundManager can run Start()");
-			return;
-		}
-        instance.Instance_PlaySound(fileName);
-    }
     private void Instance_PlaySound(string fileName) {
         LoadSound(fileName);
+        Instance_PlaySound(audioDictionary[fileName]);
+    }
+    private void Instance_PlaySound(AudioClip audioClip) {
         AudioSource audioSource = GetAudioSource();
-        audioSource.PlayOneShot(audioDictionary[fileName]);
+        audioSource.PlayOneShot(audioClip);
         busyAudioSources.Add(audioSource);
     }
     private AudioSource GetAudioSource() {
